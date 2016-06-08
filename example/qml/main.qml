@@ -28,7 +28,7 @@ ApplicationWindow {
             Layout.minimumWidth: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
-            aspects: ["render", "logic", "input"]
+            aspects: ["render", "input"]
             focus: true
 
             Q3D.Entity {
@@ -36,11 +36,11 @@ ApplicationWindow {
                 Q3D.Camera {
                     id: camera
                     projectionType: Q3D.CameraLens.PerspectiveProjection
-                    fieldOfView: 45
+                    fieldOfView: 75
                     aspectRatio: scene3d.width/scene3d.height
                     nearPlane : 0.1
                     farPlane : 1000.0
-                    position: Qt.vector3d( 0.0, 0.0, -40.0 )
+                    position: Qt.vector3d( 0.0, 0.0, -10.0 )
                     upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
                     viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
                 }
@@ -65,8 +65,8 @@ ApplicationWindow {
                                         layers: ["points"]
                                         StateSet {
                                             renderStates: [
-                                                //PointSize { specification: PointSize.StaticValue; value: 5 },
-                                                PointSize { specification: PointSize.Programmable },
+                                                PointSize { specification: PointSize.StaticValue; value: 5 },
+                                                //PointSize { specification: PointSize.Programmable }, //supported since OpenGL 3.2
                                                 DepthTest { func: DepthTest.Less },
                                                 DepthMask { mask: true }
                                             ]
@@ -87,6 +87,7 @@ ApplicationWindow {
                             names: "points"
                         }
                     property var meshTransform: Q3D.Transform {
+                            id: pointcloudTransform
                             property real userAngle: 0.0
                             scale: 10
                             rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), userAngle)
@@ -120,7 +121,7 @@ ApplicationWindow {
                     property var meshTransform: Q3D.Transform {
                         id: sphereTransform
                         property real userAngle: 0.0
-                        translation: Qt.vector3d(20, 0, 0)
+                        translation: Qt.vector3d(5, 0, 0)
                         rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), userAngle)
                     }
                     property var sphereMesh: SphereMesh {
@@ -131,7 +132,7 @@ ApplicationWindow {
                     components: [ sphereMesh, materialPhong, meshTransform, layerSolid ]
                 }
                 NumberAnimation {
-                    target: sphereTransform
+                    target: pointcloudTransform
                     property: "userAngle"
                     duration: 10000
                     from: 0

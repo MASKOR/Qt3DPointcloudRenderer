@@ -12,7 +12,7 @@ class QPointcloudGeometry : public Qt3DRender::QGeometry
     Q_PROPERTY(QPointcloud *pointcloud READ pointcloud WRITE setPointcloud NOTIFY pointcloudChanged)
 
 public:
-    explicit QPointcloudGeometry(QNode *parent = nullptr);
+    explicit QPointcloudGeometry(QNode *parent = NULL);
     ~QPointcloudGeometry();
     void updateVertices();
 

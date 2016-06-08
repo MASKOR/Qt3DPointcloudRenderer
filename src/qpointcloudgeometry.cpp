@@ -27,7 +27,7 @@ public:
     bool operator ==(const Qt3DRender::QBufferFunctor /*QBufferDataGenerator*/ &other) const Q_DECL_OVERRIDE
     {
         const PointcloudVertexDataFunctor *otherFunctor = functor_cast<PointcloudVertexDataFunctor>(&other);
-        if (otherFunctor != nullptr)
+        if (otherFunctor != NULL)
             return otherFunctor->m_pointcloud == m_pointcloud;
         return false;
     }
