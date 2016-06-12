@@ -1,6 +1,7 @@
 #include "qpointcloudreader.h"
 #include "pcl/io/pcd_io.h"
 #include "pcl/io/ply_io.h"
+#include <QDebug>
 
 QPointCloudReader::QPointCloudReader()
     :m_pointcloud(new QPointcloud())
@@ -31,6 +32,7 @@ void QPointCloudReader::setFilename(QString filename)
         pcl::PLYReader reader;
         reader.read(filename.toStdString(), *m_pointcloud->pointcloud());
     }
+    qDebug() << "Read Pointcloud" << filename << "with" << ((m_pointcloud->pointcloud()->width) * (m_pointcloud->pointcloud()->height)) << "points.";
     m_filename = filename;
     Q_EMIT filenameChanged(filename);
     Q_EMIT pointcloudChanged(m_pointcloud);

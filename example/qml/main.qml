@@ -5,12 +5,15 @@ import QtGraphicalEffects 1.0
 import QtQuick.Scene3D 2.0
 import Qt3D.Core 2.0 as Q3D
 import Qt3D.Render 2.0
+import Qt3D.Input 2.0
+import Qt3D.Extras 2.0
 
 import pcl 1.0
 
 import QtQuick 2.0 as QQ2
 
 ApplicationWindow {
+    id: window
     title: qsTr("Map Visualization")
     width: 1200
     height: 800
@@ -28,63 +31,132 @@ ApplicationWindow {
             Layout.minimumWidth: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
-            aspects: ["render", "input"]
+            aspects: ["input", "logic"]
+            cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
             focus: true
-
             Q3D.Entity {
                 id: sceneRoot
-                Q3D.Camera {
-                    id: camera
-                    projectionType: Q3D.CameraLens.PerspectiveProjection
+
+                Camera {
+                    id: mainCamera
+                    projectionType: CameraLens.PerspectiveProjection
                     fieldOfView: 75
                     aspectRatio: scene3d.width/scene3d.height
                     nearPlane : 0.1
                     farPlane : 1000.0
-                    position: Qt.vector3d( 0.0, 0.0, -10.0 )
+                    position: Qt.vector3d( 0.0, 0.0, -40.0 )
                     upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
                     viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
                 }
 
-                Q3D.Configuration  {
-                    controlledCamera: camera
+                FirstPersonCameraController {
+                //OrbitCameraController {
+                    camera: mainCamera
                 }
 
                 components: [
-                    FrameGraph {
+                    RenderSettings {
                         activeFrameGraph: Viewport {
                             id: viewport
-                            rect: Qt.rect(0.0, 0.0, 1.0, 1.0) // From Top Left
-                            clearColor: "transparent"
-
-                            CameraSelector {
-                                id : cameraSelector
-                                camera: camera
-                                ClearBuffer {
-                                    buffers : ClearBuffer.ColorDepthBuffer
-                                    LayerFilter {
-                                        layers: ["points"]
-                                        StateSet {
-                                            renderStates: [
-                                                PointSize { specification: PointSize.StaticValue; value: 5 },
-                                                //PointSize { specification: PointSize.Programmable }, //supported since OpenGL 3.2
-                                                DepthTest { func: DepthTest.Less },
-                                                DepthMask { mask: true }
-                                            ]
+                            normalizedRect: Qt.rect(0.0, 0.0, 1.0, 1.0) // From Top Left
+                            RenderSurfaceSelector {
+                                CameraSelector {
+                                    id : cameraSelector
+                                    camera: mainCamera
+                                    FrustumCulling {
+                                        ClearBuffers {
+                                            buffers : ClearBuffers.ColorDepthBuffer
+                                            clearColor: "white"
+                                            NoDraw {}
+                                        }
+                                        LayerFilter {
+                                            layers: solidLayer
+                                        }
+                                        LayerFilter {
+                                            layers: pointLayer
+                                            RenderStateSet {
+                                                renderStates: [
+                                                    PointSize { sizeMode: PointSize.Fixed; value: 5.0 }, // exception when closing application in qt 5.7
+                                                    //PointSize { specification: PointSize.Programmable }, //supported since OpenGL 3.2
+                                                    DepthTest { depthFunction: DepthTest.Less }
+                                                    //DepthMask { mask: true }
+                                                ]
+                                            }
                                         }
                                     }
                                 }
-                                LayerFilter {
-                                    layers: ["solid"]
-                                }
                             }
                         }
+                    },
+                    // Event Source will be set by the Qt3DQuickWindow
+                    InputSettings {
+                        eventSource: window
+                        enabled: true
                     }
                 ]
+
+                PhongMaterial {
+                    id: material
+                }
+
+                TorusMesh {
+                    id: torusMesh
+                    radius: 5
+                    minorRadius: 1
+                    rings: 100
+                    slices: 20
+                }
+
+                Q3D.Transform {
+                    id: torusTransform
+                    scale3D: Qt.vector3d(1.5, 1.5, 1.5)
+                    rotation: fromAxisAndAngle(Qt.vector3d(1, 0, 0), 45)
+                }
+
+                Layer {
+                    id: solidLayer
+                }
+                Q3D.Entity {
+                    id: torusEntity
+                    components: [ solidLayer, torusMesh, material, torusTransform ]
+                }
+
+                SphereMesh {
+                    id: sphereMesh
+                    radius: 3
+                }
+
+                Q3D.Transform {
+                    id: sphereTransform
+                    property real userAngle: 0.0
+                    matrix: {
+                        var m = Qt.matrix4x4();
+                        m.rotate(userAngle, Qt.vector3d(0, 1, 0));
+                        m.translate(Qt.vector3d(20, 0, 0));
+                        return m;
+                    }
+                }
+
+                QQ2.NumberAnimation {
+                    target: sphereTransform
+                    property: "userAngle"
+                    duration: 10000
+                    from: 0
+                    to: 360
+
+                    loops: QQ2.Animation.Infinite
+                    running: true
+                }
+
+                Q3D.Entity {
+                    id: sphereEntity
+                    components: [ solidLayer, sphereMesh, material, sphereTransform ]
+                }
 
                 Q3D.Entity {
                     id: pointcloud
                     property Layer layerPoints: Layer {
-                            names: "points"
+                            id: pointLayer
                         }
                     property var meshTransform: Q3D.Transform {
                             id: pointcloudTransform
@@ -111,35 +183,17 @@ ApplicationWindow {
                     }
                     //property Material materialPoint: PerVertexColorMaterial {}
                     components: [ pointcloudMesh, materialPoint, meshTransform, layerPoints ]
-                }
 
-                Q3D.Entity {
-                    id: sphereEntity
-                    property Layer layerSolid: Layer {
-                            names: "solid"
-                        }
-                    property var meshTransform: Q3D.Transform {
-                        id: sphereTransform
-                        property real userAngle: 0.0
-                        translation: Qt.vector3d(5, 0, 0)
-                        rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), userAngle)
-                    }
-                    property var sphereMesh: SphereMesh {
-                        radius: 1
-                    }
-                    property Material materialPhong: PhongMaterial {
-                    }
-                    components: [ sphereMesh, materialPhong, meshTransform, layerSolid ]
-                }
-                NumberAnimation {
-                    target: pointcloudTransform
-                    property: "userAngle"
-                    duration: 10000
-                    from: 0
-                    to: 360
+                    NumberAnimation {
+                        target: pointcloudTransform
+                        property: "userAngle"
+                        duration: 10000
+                        from: 0
+                        to: 360
 
-                    loops: Animation.Infinite
-                    running: true
+                        loops: Animation.Infinite
+                        running: true
+                    }
                 }
             }
         }

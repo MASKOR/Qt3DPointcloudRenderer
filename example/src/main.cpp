@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
     qmlRegisterType<QPointCloudReader>("pcl", 1, 0, "PointcloudReader");
     qmlRegisterType<QPointcloud>("pcl", 1, 0, "Pointcloud");

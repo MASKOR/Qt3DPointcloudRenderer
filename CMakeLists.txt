@@ -13,6 +13,7 @@ find_package(Qt53DQuick REQUIRED)
 find_package(Qt53DRender REQUIRED)
 find_package(Qt53DQuickRender REQUIRED)
 
+# PCL can not find boost. This is a bloody mess on windows
 find_package(PCL REQUIRED COMPONENTS common io apps filters kdtree search features surface keypoints registration octree sample_consensus segmentation tracking)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})

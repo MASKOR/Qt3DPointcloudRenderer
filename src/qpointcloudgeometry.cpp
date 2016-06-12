@@ -1,20 +1,22 @@
 #include "qpointcloudgeometry.h"
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QAttribute>
-#include <Qt3DRender/qbufferfunctor.h>
+#include <Qt3DRender/qbufferdatagenerator.h>
 #include <QHash>
 #include <iomanip>
 #include <pcl/PCLPointCloud2.h>
 
 QByteArray createPointcloudVertexData(pcl::PCLPointCloud2 *pointcloud)
 {
+    if(pointcloud == NULL || pointcloud->data.size() == 0)
+        return QByteArray();
     return QByteArray(reinterpret_cast<char*>(&pointcloud->data[0]), pointcloud->data.size());
 }
 
-class PointcloudVertexDataFunctor : public Qt3DRender::QBufferFunctor /*QBufferDataGenerator*/
+class PointcloudVertexDataGenerator : public Qt3DRender::QBufferDataGenerator /*Qt3DRender::QBufferFunctor*/
 {
 public:
-    PointcloudVertexDataFunctor(pcl::PCLPointCloud2 *pointcloud)
+    PointcloudVertexDataGenerator(pcl::PCLPointCloud2 *pointcloud)
         : m_pointcloud(pointcloud)
     {
     }
@@ -24,15 +26,15 @@ public:
         return createPointcloudVertexData(m_pointcloud);
     }
 
-    bool operator ==(const Qt3DRender::QBufferFunctor /*QBufferDataGenerator*/ &other) const Q_DECL_OVERRIDE
+    bool operator ==(const Qt3DRender::QBufferDataGenerator &other) const Q_DECL_OVERRIDE
     {
-        const PointcloudVertexDataFunctor *otherFunctor = functor_cast<PointcloudVertexDataFunctor>(&other);
+        const PointcloudVertexDataGenerator *otherFunctor = functor_cast<PointcloudVertexDataGenerator>(&other);
         if (otherFunctor != NULL)
             return otherFunctor->m_pointcloud == m_pointcloud;
         return false;
     }
 
-    QT3D_FUNCTOR(PointcloudVertexDataFunctor)
+    QT3D_FUNCTOR(PointcloudVertexDataGenerator)
 
 private:
     pcl::PCLPointCloud2 *m_pointcloud;
@@ -41,6 +43,9 @@ private:
 class QPointcloudGeometryPrivate
 {
 public:
+    QPointcloudGeometryPrivate()
+        :m_vertexBuffer(NULL),
+         m_pointcloud(NULL){}
     Qt3DRender::QBuffer *m_vertexBuffer;
     QPointcloud *m_pointcloud;
 };
@@ -56,7 +61,7 @@ QPointcloudGeometry::~QPointcloudGeometry()
     delete m_p;
 }
 
-Qt3DRender::QAttribute::DataType pclTypeToAttributeType(pcl::uint8_t inp)
+Qt3DRender::QAttribute::VertexBaseType pclTypeToAttributeType(pcl::uint8_t inp)
 {
     switch(inp)
     {
@@ -78,11 +83,17 @@ Qt3DRender::QAttribute::DataType pclTypeToAttributeType(pcl::uint8_t inp)
         return Qt3DRender::QAttribute::Double;
     default:
         Q_ASSERT(false);
+        return Qt3DRender::QAttribute::Float;
     }
 }
 
 void QPointcloudGeometry::updateVertices()
 {
+    if(m_p->m_pointcloud == NULL
+       || m_p->m_pointcloud->pointcloud() == NULL
+       || m_p->m_pointcloud->pointcloud()->data.size() == 0)
+        return;
+
     QHash<QString, pcl::PCLPointField*> pfs;
     for(int i=0 ; m_p->m_pointcloud->pointcloud()->fields.size()>i ; ++i)
     {
@@ -124,7 +135,7 @@ void QPointcloudGeometry::updateVertices()
     {
         int num = 1 + (pfs.contains("normal_y")?1:0) + (pfs.contains("normal_z")?1:0) + (pfs.contains("curvature")?1:0);
         Qt3DRender::QAttribute* attrib = new Qt3DRender::QAttribute(this);
-        attrib->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
+        attrib->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
         attrib->setDataType(pclTypeToAttributeType((*pf)->datatype));
         attrib->setDataSize(num);
         attrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -138,7 +149,7 @@ void QPointcloudGeometry::updateVertices()
     if(pf != pfs.cend())
     {
         Qt3DRender::QAttribute* attrib = new Qt3DRender::QAttribute(this);
-        attrib->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
+        attrib->setName("intensity");
         attrib->setDataType(pclTypeToAttributeType((*pf)->datatype));
         attrib->setDataSize(1);
         attrib->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
@@ -148,7 +159,8 @@ void QPointcloudGeometry::updateVertices()
         attrib->setCount(m_p->m_pointcloud->width() * m_p->m_pointcloud->height());
         addAttribute(attrib);
     }
-    m_p->m_vertexBuffer->setBufferFunctor(Qt3DRender::QBufferFunctorPtr(new PointcloudVertexDataFunctor(m_p->m_pointcloud->pointcloud())));
+    //m_p->m_vertexBuffer->setBufferFunctor(Qt3DRender::QBufferFunctorPtr(new PointcloudVertexDataFunctor(m_p->m_pointcloud->pointcloud())));
+    m_p->m_vertexBuffer->setDataGenerator(Qt3DRender::QBufferDataGeneratorPtr(new PointcloudVertexDataGenerator(m_p->m_pointcloud->pointcloud())));
 }
 
 QPointcloud *QPointcloudGeometry::pointcloud() const
@@ -162,7 +174,6 @@ void QPointcloudGeometry::setPointcloud(QPointcloud *pointcloud)
         return;
 
     m_p->m_pointcloud = pointcloud;
-    m_p->m_vertexBuffer->setBufferFunctor(QSharedPointer<PointcloudVertexDataFunctor>::create(m_p->m_pointcloud->pointcloud()));
     updateVertices();
     Q_EMIT pointcloudChanged(pointcloud);
 }
