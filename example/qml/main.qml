@@ -10,8 +10,6 @@ import Qt3D.Extras 2.0
 
 import pcl 1.0
 
-import QtQuick 2.0 as QQ2
-
 ApplicationWindow {
     id: window
     title: qsTr("Map Visualization")
@@ -137,14 +135,14 @@ ApplicationWindow {
                     }
                 }
 
-                QQ2.NumberAnimation {
+                NumberAnimation {
                     target: sphereTransform
                     property: "userAngle"
                     duration: 10000
                     from: 0
                     to: 360
 
-                    loops: QQ2.Animation.Infinite
+                    loops: Animation.Infinite
                     running: true
                 }
 

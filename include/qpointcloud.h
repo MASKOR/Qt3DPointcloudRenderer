@@ -23,7 +23,7 @@ class QPointcloud : public QObject
     Q_PROPERTY(QByteArray data READ data WRITE setData NOTIFY dataChanged)
     Q_PROPERTY(quint8 is_dense READ is_dense WRITE setIs_dense NOTIFY is_denseChanged)
 public:
-    QPointcloud();
+    QPointcloud(QObject *parent = NULL);
     ////
     /// \brief QPointcloud takes ownership of the given pointcloud
     /// \param pointcloud will be deleted in destructor. Do not use shared pointer pcl::PCLPointcloud2Ptr from outside.

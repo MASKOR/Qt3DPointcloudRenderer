@@ -26,41 +26,12 @@ public:
         {
             m_fields.append( new QPointfield(m_parent, &(*iter) ) );
         }
-//        QList<QPointfield*> foundFields;
-//        std::vector< ::pcl::PCLPointField* > createdFields(m_pointcloud->fields);
-//        for(std::vector< ::pcl::PCLPointField>::const_iterator iter(m_pointcloud->fields.cbegin());
-//            iter != m_pointcloud->fields.cend(); iter++)
-//        {
-//            createdFields.push_back(iter);
-//        }
-//        for(QList<QPointfield*>::iterator qiter(m_fields.begin()) ; qiter != m_fields.end() ; qiter++)
-//        {
-//            bool found = false;
-//            for(std::vector< ::pcl::PCLPointField>::const_iterator iter(createdFields.cbegin());
-//                iter != createdFields.cend(); iter++)
-//            {
-//                if((*qiter)->name() == QString::fromStdString(iter->name))
-//                {
-//                    found = true;
-//                    createdFields.erase(iter);
-//                    break;
-//                }
-//            }
-//            if(!found)
-//            {
-//                m_fields.removeOne(*qiter);
-//                delete *qiter;
-//            }
-//        }
-//        for(std::vector< ::pcl::PCLPointField >::const_iterator iter(createdFields.cbegin()) ; iter != createdFields.cend() ; iter++)
-//        {
-//            m_fields.append( new QPointfield(m_parent, iter) );
-//        }
     }
 };
 
-QPointcloud::QPointcloud()
-    :m_priv(new QPointcloudPrivate(this))
+QPointcloud::QPointcloud(QObject *parent)
+    :QObject(parent),
+     m_priv(new QPointcloudPrivate(this))
 {
     m_priv->m_pointcloud = new pcl::PCLPointCloud2();
 }
