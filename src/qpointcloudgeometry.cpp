@@ -114,6 +114,7 @@ void QPointcloudGeometry::updateVertices()
         attrib->setByteOffset((*pf)->offset);
         attrib->setCount(m_p->m_pointcloud->width() * m_p->m_pointcloud->height());
         addAttribute(attrib);
+        setBoundingVolumePositionAttribute(attrib);
     }
     pf = pfs.find("r");
     if(pf != pfs.cend())
