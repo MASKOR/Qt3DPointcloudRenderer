@@ -3,12 +3,22 @@
 
 #include <QObject>
 #include <QQmlListProperty>
-#include "qpointfield.h"
+#include "qpointfield.h" 
 
+
+#ifdef WITH_PCL
 namespace pcl
 {
 class PCLPointCloud2;
 }
+#endif
+
+#ifdef WITH_LAS
+namespace liblas
+{
+class Reader;
+}
+#endif
 
 class QPointcloudPrivate;
 class QPointcloud : public QObject
@@ -30,6 +40,9 @@ public:
     ///
     QPointcloud(pcl::PCLPointCloud2 *pointcloud);
     ~QPointcloud();
+
+    void updateAttributes();
+
     quint32 height() const;
     quint32 width() const;
 
@@ -41,7 +54,15 @@ public:
     QByteArray data() const;
     quint8 is_dense() const;
 
-    pcl::PCLPointCloud2* pointcloud();
+    const QList<QPointfield *> &getFields();
+
+#ifdef WITH_PCL
+    pcl::PCLPointCloud2* pointcloud() const;
+    void setPointcloud(const pcl::PCLPointCloud2 &copy);
+#endif
+#ifdef WITH_LAS
+    void read(liblas::Reader* reader, bool demean, bool normalize, float normalizeScale, bool flipYZ);
+#endif
 
 public Q_SLOTS:
     void setHeight(quint32 height);

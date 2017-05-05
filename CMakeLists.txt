@@ -13,11 +13,47 @@ find_package(Qt53DQuick REQUIRED)
 find_package(Qt53DRender REQUIRED)
 find_package(Qt53DQuickRender REQUIRED)
 
-# PCL can not find boost. This is a bloody mess on windows
-find_package(PCL REQUIRED COMPONENTS common io apps filters kdtree search features surface keypoints registration octree sample_consensus segmentation tracking)
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+set(WITH_PCL TRUE CACHE BOOL "Enable pcl")
+set(WITH_LAS TRUE CACHE BOOL "Enable las")
+
+if(WITH_PCL)
+    find_package(PCL REQUIRED COMPONENTS common io)
+    link_directories(${PCL_LIBRARY_DIRS})
+endif(WITH_PCL)
+
+if(WITH_LAS)
+    # LibLAS is used for easy integration with windows. Thus it is not included
+    # with an additional find-script, but quick-and-dirty by integrating LAS into
+    # the the project. Retain libLAS copyright notice in your project (BSD License).
+
+    set(HAVE_GDAL FALSE CACHE BOOL "Enable GDAL for LibLAS")
+    set(HAVE_LIBGEOTIFF FALSE CACHE BOOL "Enable libGeoTIFF for LibLAS")
+    set(HAVE_LASZIP TRUE CACHE BOOL "Enable Laszip for LibLAS")
+    set(LIBLAS_PATH CACHE PATH "Path to libLAS folder, containing \"include\" and \"src\"")
+    set(LIBLASZIP_PATH CACHE PATH "Path to LASzip folder VERSION v2.2.0! (newer versions are incompatible)")
+
+    file(GLOB_RECURSE LASZIP_SOURCES ${LIBLASZIP_PATH}/include/*.hpp
+                                     ${LIBLASZIP_PATH}/include/*.h
+                                     ${LIBLASZIP_PATH}/src/*.hpp
+                                     ${LIBLASZIP_PATH}/src/*.h
+                                     ${LIBLAS_PATH}/src/*.cpp )
+
+    file(GLOB_RECURSE LIBLAS_SOURCES ${LIBLAS_PATH}/include/*.hpp
+                                     ${LIBLAS_PATH}/include/*.h
+                                     ${LIBLAS_PATH}/src/*.hpp
+                                     ${LIBLAS_PATH}/src/*.h
+                                     ${LIBLAS_PATH}/src/*.cpp )
+    if(NOT HAVE_GDAL)
+      file(GLOB_RECURSE GT_SRC ${LIBLAS_PATH}/src/gt_*.cpp
+                               ${LIBLAS_PATH}/src/gt_*.h)
+      list(REMOVE_ITEM LIBLAS_SOURCES "${GT_SRC}")
+    endif(NOT HAVE_GDAL)
+
+    if(NOT HAVE_LIBGEOTIFF)
+      file(GLOB_RECURSE GEO_SRC ${LIBLAS_PATH}/src/tifvsi.cpp)
+      list(REMOVE_ITEM LIBLAS_SOURCES "${GEO_SRC}")
+    endif(NOT HAVE_LIBGEOTIFF)
+endif(WITH_LAS)
 
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(${PROJECT_SOURCE_DIR}/include/)
@@ -40,9 +76,24 @@ set(BUILD_EXAMPLE ON CACHE BOOL "Build the example project")
 if(BUILD_EXAMPLE)
     add_subdirectory(example)
 endif(BUILD_EXAMPLE)
-  
-add_library(Qt3DPointcloudRenderer ${SOURCE} ${HEADER})
 
-target_link_libraries(Qt3DPointcloudRenderer ${PCL_LIBRARIES})
+add_library(Qt3DPointcloudRenderer ${SOURCE} ${HEADER} ${LIBLAS_SOURCES} ${LASZIP_SOURCES})
+
+if(WITH_PCL)
+    target_link_libraries(Qt3DPointcloudRenderer ${PCL_LIBRARIES} stdc++)
+    target_include_directories(${PROJECT_NAME} PRIVATE PRIVATE ${PCL_INCLUDE_DIRS})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${PCL_DEFINITIONS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_PCL)
+endif(WITH_PCL)
+
+if(WITH_LAS)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBLAS_PATH}/include/)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_LAS)
+    if(HAVE_LASZIP)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${LIBLASZIP_PATH}/include/
+                                                           ${LIBLASZIP_PATH}/include/laszip
+                                                           ${LIBLASZIP_PATH}/src/)
+    endif(HAVE_LASZIP)
+endif(WITH_LAS)
 
 qt5_use_modules(Qt3DPointcloudRenderer Qml Widgets Quick 3DCore 3DQuick 3DRender 3DQuickRender)

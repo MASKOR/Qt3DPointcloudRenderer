@@ -18,9 +18,11 @@ public:
 
     QPointcloud *pointcloud() const;
 
+
 public Q_SLOTS:
     void setPointcloud(QPointcloud *pointcloud);
-
+private Q_SLOTS:
+    void updateAttributes();
 Q_SIGNALS:
     void pointcloudChanged(QPointcloud *pointcloud);
 

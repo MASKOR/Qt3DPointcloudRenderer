@@ -1,7 +1,12 @@
 #ifndef QPOINTFIELD_H
 #define QPOINTFIELD_H
 
-#include "pcl/PCLPointField.h"
+#ifdef WITH_PCL
+namespace pcl {
+    class PCLPointField;
+}
+#endif
+
 #include <QObject>
 
 class QPointfield : public QObject
@@ -14,24 +19,28 @@ class QPointfield : public QObject
     Q_PROPERTY(PointFieldTypes datatype READ datatype WRITE setDatatype NOTIFY datatypeChanged)
     Q_PROPERTY(quint32 count READ count WRITE setCount NOTIFY countChanged)
 public:
-    enum PointFieldTypes { INT8 = pcl::PCLPointField::INT8,
-                           UINT8 = pcl::PCLPointField::UINT8,
-                           INT16 = pcl::PCLPointField::INT16,
-                           UINT16 = pcl::PCLPointField::UINT16,
-                           INT32 = pcl::PCLPointField::INT32,
-                           UINT32 = pcl::PCLPointField::UINT32,
-                           FLOAT32 = pcl::PCLPointField::FLOAT32,
-                           FLOAT64 = pcl::PCLPointField::FLOAT64 };
-
+    enum PointFieldTypes { INT8,
+                           UINT8,
+                           INT16,
+                           UINT16,
+                           INT32,
+                           UINT32,
+                           FLOAT32,
+                           FLOAT64};
+#ifdef WITH_PCL
     QPointfield(QObject *parent, pcl::PCLPointField *field);
     QPointfield(pcl::PCLPointField *field);
+#endif
+    QPointfield(QObject *parent, QString name, quint32 offset, PointFieldTypes type, quint32 count);
     //QPointfield(const QPointfield &cpy);
     QString name() const;
     quint32 offset() const;
     PointFieldTypes datatype() const;
     quint32 count() const;
 
+#ifdef WITH_PCL
     const pcl::PCLPointField* getPointfield() { return m_pointfield; }
+#endif
 public Q_SLOTS:
 
     void setName(QString name);
@@ -46,7 +55,14 @@ Q_SIGNALS:
     void countChanged(quint32 count);
 
 private:
+
+    QString m_name;
+    quint32 m_offset;
+    PointFieldTypes m_datatype;
+    quint32 m_count;
+#ifdef WITH_PCL
     pcl::PCLPointField *m_pointfield;
+#endif
 };
 
 #endif
