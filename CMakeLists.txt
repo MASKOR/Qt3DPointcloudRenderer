@@ -63,12 +63,14 @@ set(SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloudgeometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointfield.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloudreader.cpp
+#    ${CMAKE_CURRENT_SOURCE_DIR}/src/xyzcsvreader.cpp
   )
 set(HEADER
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointcloud.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointcloudgeometry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointfield.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointcloudreader.h
+#    ${CMAKE_CURRENT_SOURCE_DIR}/include/xyzcsvreader.h
   )
 
 set(BUILD_EXAMPLE ON CACHE BOOL "Build the example project")

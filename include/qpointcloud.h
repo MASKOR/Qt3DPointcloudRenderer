@@ -2,6 +2,7 @@
 #define QPOINTCLOUD_H
 
 #include <QObject>
+#include <QVector3D>
 #include <QQmlListProperty>
 #include "qpointfield.h" 
 
@@ -32,6 +33,10 @@ class QPointcloud : public QObject
     Q_PROPERTY(quint32 row_step READ row_step WRITE setRow_step NOTIFY row_stepChanged)
     Q_PROPERTY(QByteArray data READ data WRITE setData NOTIFY dataChanged)
     Q_PROPERTY(quint8 is_dense READ is_dense WRITE setIs_dense NOTIFY is_denseChanged)
+    Q_PROPERTY(QVector3D minimum READ minimum NOTIFY minimumChanged)
+    Q_PROPERTY(QVector3D maximum READ maximum NOTIFY maximumChanged)
+    Q_PROPERTY(QVector3D centroid READ centroid NOTIFY centroidChanged)
+    Q_PROPERTY(QVector3D offset READ offset NOTIFY offsetChanged)
 public:
     QPointcloud(QObject *parent = NULL);
     ////
@@ -61,8 +66,37 @@ public:
     void setPointcloud(const pcl::PCLPointCloud2 &copy);
 #endif
 #ifdef WITH_LAS
-    void read(liblas::Reader* reader, bool demean, bool normalize, float normalizeScale, bool flipYZ);
+    ///
+    /// \brief read Reads a LAS dataset. LAS files often have big offsets which cannot be expressed using float.
+    /// Thus, an offset must be applied in order to have floatingpoint data which can be visualized.
+    /// This offset must be either known in advance or must be caluclated in this method
+    /// (before conversion to floats happens).
+    /// \param reader the liblas::Reader
+    /// \param useOffset use the provided offset or output the calculated offset
+    /// \param offset this is _substracted_ from every point. Offset of pointcloud to viewing coordinate system.
+    /// \param demean calculate new offset. This overrides useOffset.
+    /// \param normalize resize the pointcloud to fit a box with size normalizeScale in each direction. This overrides useOffset.
+    /// \param normalizeScale size to bring the normalized model to.
+    /// \param flipYZ if visualization uses Y axis up and pointcloud uses Z axis up, this must be true. Should not be used.
+    /// \param nth only read in every nth point (fake level of detail).
+    ///
+    void read(liblas::Reader* reader
+              , const bool useOffset = false
+              , double *offsetX = nullptr
+              , double *offsetY = nullptr
+              , double *offsetZ = nullptr
+              , bool demean = false
+              , bool normalize = false
+              , float normalizeScale = 1.0f
+              , bool flipYZ = false
+              , int nth = 1);
 #endif
+
+    void readXyz(QString &path, bool demean = true, bool normalize = true, float normalizeScale = 10.f, bool flipYZ = true);
+    QVector3D minimum() const;
+    QVector3D maximum() const;
+    QVector3D centroid() const;
+    QVector3D offset() const;
 
 public Q_SLOTS:
     void setHeight(quint32 height);
@@ -82,6 +116,10 @@ Q_SIGNALS:
     void row_stepChanged(quint32 row_step);
     void dataChanged(QByteArray data);
     void is_denseChanged(quint8 is_dense);
+    void minimumChanged(QVector3D minimum);
+    void maximumChanged(QVector3D maximum);
+    void centroidChanged(QVector3D centroid);
+    void offsetChanged(QVector3D offset);
 
 private:
     QPointcloudPrivate *m_priv;
