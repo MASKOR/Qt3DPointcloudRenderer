@@ -1,7 +1,7 @@
 #ifndef QPOINTFIELD_H
 #define QPOINTFIELD_H
 
-#ifdef WITH_PCL
+#if WITH_PCL
 namespace pcl {
     class PCLPointField;
 }
@@ -27,7 +27,7 @@ public:
                            UINT32,
                            FLOAT32,
                            FLOAT64};
-#ifdef WITH_PCL
+#if WITH_PCL
     QPointfield(QObject *parent, pcl::PCLPointField *field);
     QPointfield(pcl::PCLPointField *field);
 #endif
@@ -38,7 +38,7 @@ public:
     PointFieldTypes datatype() const;
     quint32 count() const;
 
-#ifdef WITH_PCL
+#if WITH_PCL
     const pcl::PCLPointField* getPointfield() { return m_pointfield; }
 #endif
 public Q_SLOTS:
@@ -60,7 +60,7 @@ private:
     quint32 m_offset;
     PointFieldTypes m_datatype;
     quint32 m_count;
-#ifdef WITH_PCL
+#if WITH_PCL
     pcl::PCLPointField *m_pointfield;
 #endif
 };

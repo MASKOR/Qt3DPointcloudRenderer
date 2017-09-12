@@ -1,6 +1,6 @@
 #include "qpointfield.h"
 
-#ifdef WITH_PCL
+#if WITH_PCL
 #include <pcl/PCLPointField.h>
 
 pcl::uint8_t toPCLDatatype(const QPointfield::PointFieldTypes& datatype)
@@ -53,7 +53,7 @@ QPointfield::PointFieldTypes fromPCLDatatype(const pcl::uint8_t &datatype)
 }
 #endif
 
-#ifdef WITH_PCL
+#if WITH_PCL
 QPointfield::QPointfield(QObject *parent, pcl::PCLPointField *field)
     :QObject(parent)
     ,m_name(field->name.c_str())
@@ -80,7 +80,7 @@ QPointfield::QPointfield(QObject *parent, QString name, quint32 offset, PointFie
     ,m_offset(offset)
     ,m_datatype(type)
     ,m_count(count)
-    #ifdef WITH_PCL
+    #if WITH_PCL
     // Note, there is no way to obtain a pcl point field, if it is not given in constructor.
     ,m_pointfield(nullptr)
     #endif
@@ -112,7 +112,7 @@ void QPointfield::setName(QString name)
     if (m_name == name)
         return;
     m_name = name;
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_pointfield)
     {
         std::string stdname(name.toStdString());
@@ -127,7 +127,7 @@ void QPointfield::setOffset(quint32 offset)
     if (m_offset == offset)
         return;
     m_offset = offset;
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_pointfield)
     {
         m_pointfield->offset = offset;
@@ -141,7 +141,7 @@ void QPointfield::setDatatype(QPointfield::PointFieldTypes datatype)
     if (m_datatype == datatype)
         return;
     m_datatype = datatype;
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_pointfield)
     {
         m_pointfield->datatype = toPCLDatatype(datatype);
@@ -155,7 +155,7 @@ void QPointfield::setCount(quint32 count)
     if (m_count == count)
         return;
     m_count = count;
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_pointfield)
     {
         m_pointfield->count = count;

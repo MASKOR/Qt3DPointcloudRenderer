@@ -7,14 +7,14 @@
 #include "qpointfield.h" 
 
 
-#ifdef WITH_PCL
+#if WITH_PCL
 namespace pcl
 {
 class PCLPointCloud2;
 }
 #endif
 
-#ifdef WITH_LAS
+#if WITH_LAS
 namespace liblas
 {
 class Reader;
@@ -61,11 +61,11 @@ public:
 
     const QList<QPointfield *> &getFields();
 
-#ifdef WITH_PCL
+#if WITH_PCL
     pcl::PCLPointCloud2* pointcloud() const;
     void setPointcloud(const pcl::PCLPointCloud2 &copy);
 #endif
-#ifdef WITH_LAS
+#if WITH_LAS
     ///
     /// \brief read Reads a LAS dataset. LAS files often have big offsets which cannot be expressed using float.
     /// Thus, an offset must be applied in order to have floatingpoint data which can be visualized.

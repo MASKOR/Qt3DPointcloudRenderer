@@ -93,7 +93,7 @@ Qt3DRender::QAttribute::VertexBaseType pclTypeToAttributeType(const QPointfield:
 void QPointcloudGeometry::updateVertices()
 {
     if(
-#ifdef WITH_PCL
+#if WITH_PCL
            (  m_p->m_pointcloud == NULL
            || m_p->m_pointcloud->pointcloud() == NULL
            || m_p->m_pointcloud->pointcloud()->data.size() == 0)

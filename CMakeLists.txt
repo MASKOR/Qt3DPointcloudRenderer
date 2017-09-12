@@ -84,13 +84,13 @@ add_library(Qt3DPointcloudRenderer ${SOURCE} ${HEADER} ${LIBLAS_SOURCES} ${LASZI
 if(WITH_PCL)
     target_link_libraries(Qt3DPointcloudRenderer ${PCL_LIBRARIES} stdc++)
     target_include_directories(${PROJECT_NAME} PRIVATE PRIVATE ${PCL_INCLUDE_DIRS})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${PCL_DEFINITIONS})
-    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_PCL)
+    #target_compile_definitions(${PROJECT_NAME} PRIVATE ${PCL_DEFINITIONS}) causes command-line error in cmake from ubuntu 16.04
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_PCL=1)
 endif(WITH_PCL)
 
 if(WITH_LAS)
     target_include_directories(${PROJECT_NAME} PRIVATE ${LIBLAS_PATH}/include/)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_LAS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_LAS=1)
     if(HAVE_LASZIP)
         target_include_directories(${PROJECT_NAME} PRIVATE ${LIBLASZIP_PATH}/include/
                                                            ${LIBLASZIP_PATH}/include/laszip

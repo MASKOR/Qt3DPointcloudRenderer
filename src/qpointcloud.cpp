@@ -1,11 +1,11 @@
 #include "qpointcloud.h"
-#ifdef WITH_PCL
+#if WITH_PCL
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/point_types.h>
 #include <pcl/common/centroid.h>
 #include <pcl/common/common.h>
 #endif
-#ifdef WITH_LAS
+#if WITH_LAS
 #include <liblas/reader.hpp>
 #endif
 #include <QRgb>
@@ -61,7 +61,7 @@ public:
 
     void updateMinMax()
     {
-#ifdef WITH_PCL
+#if WITH_PCL
         pcl::PointXYZ min;
         pcl::PointXYZ max;
         pcl::PointCloud<pcl::PointXYZ> pc;
@@ -71,7 +71,7 @@ public:
         m_maximum = QVector3D(max.x, max.y, max.z);
         m_dirtyMinMax = false;
 #endif
-#ifdef WITH_LAS
+#if WITH_LAS
     //already done on read
         m_dirtyMinMax = false;
 #endif
@@ -88,7 +88,7 @@ public:
 //            (*qiter)->deleteLater();
 //        }
 //        m_fields.clear();
-//#ifdef WITH_PCL
+//#if WITH_PCL
 //        if(m_pointcloud)
 //        {
 //            for(std::vector< ::pcl::PCLPointField>::iterator iter(m_pointcloud->fields.begin());
@@ -97,11 +97,11 @@ public:
 //                m_fields.append( new QPointfield(m_parent, &(*iter) ) );
 //            }
 //        }
-//    #ifdef WITH_LAS
+//    #if WITH_LAS
 //        else
 //    #endif
 //#endif
-//#ifdef WITH_LAS
+//#if WITH_LAS
 //        {
 //            // Standard LAS fields
 //            QPointfield *f;
@@ -119,12 +119,12 @@ QPointcloud::QPointcloud(QObject *parent)
     :QObject(parent),
      m_priv(new QPointcloudPrivate(this))
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     //m_priv->m_pointcloud = new pcl::PCLPointCloud2();
 #endif
 }
 
-#ifdef WITH_PCL
+#if WITH_PCL
 QPointcloud::QPointcloud(pcl::PCLPointCloud2 *pointcloud)
     :m_priv(new QPointcloudPrivate(this))
 {
@@ -134,7 +134,7 @@ QPointcloud::QPointcloud(pcl::PCLPointCloud2 *pointcloud)
 
 QPointcloud::~QPointcloud()
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud != nullptr)
     {
         delete m_priv->m_pointcloud;
@@ -145,7 +145,7 @@ QPointcloud::~QPointcloud()
 
 void QPointcloud::updateAttributes()
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         m_priv->m_fields.clear();
@@ -164,7 +164,7 @@ void QPointcloud::updateAttributes()
 
 quint32 QPointcloud::height() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->height;
@@ -178,7 +178,7 @@ quint32 QPointcloud::height() const
 
 quint32 QPointcloud::width() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->width;
@@ -198,7 +198,7 @@ QQmlListProperty<QPointfield> QPointcloud::fields()
 void QPointcloudPrivate::fields_append(QQmlListProperty<QPointfield> *self, QPointfield *f)
 {
     QPointcloudPrivate *that = static_cast<QPointcloudPrivate*>(self->data);
-#ifdef WITH_PCL
+#if WITH_PCL
     if(that->m_pointcloud)
     {
         // This is not typical for PCL. PCL would create a new pointcloud instead.
@@ -218,7 +218,7 @@ void QPointcloudPrivate::fields_append(QQmlListProperty<QPointfield> *self, QPoi
 int QPointcloudPrivate::fields_count(QQmlListProperty<QPointfield> *self)
 {
     QPointcloudPrivate *that = static_cast<QPointcloudPrivate*>(self->data);
-#ifdef WITH_PCL
+#if WITH_PCL
     if(that->m_pointcloud)
     {
         Q_ASSERT_X(that->m_fields.count() == 0, "QPointcloudPrivate::fields_count", "Mixed up pcl and non pcl.");
@@ -235,7 +235,7 @@ int QPointcloudPrivate::fields_count(QQmlListProperty<QPointfield> *self)
 QPointfield *QPointcloudPrivate::fields_at(QQmlListProperty<QPointfield> *self, int i)
 {
     QPointcloudPrivate *that = static_cast<QPointcloudPrivate*>(self->data);
-#ifdef WITH_PCL
+#if WITH_PCL
     if(that->m_pointcloud)
     {
         Q_ASSERT_X(that->m_fields.count() == 0, "QPointcloudPrivate::fields_count", "Mixed up pcl and non pcl.");
@@ -252,7 +252,7 @@ QPointfield *QPointcloudPrivate::fields_at(QQmlListProperty<QPointfield> *self, 
 void QPointcloudPrivate::fields_clear(QQmlListProperty<QPointfield> *self)
 {
     QPointcloudPrivate *that = static_cast<QPointcloudPrivate*>(self->data);
-#ifdef WITH_PCL
+#if WITH_PCL
     if(that->m_pointcloud)
     {
         Q_ASSERT_X(that->m_fields.count() == 0, "QPointcloudPrivate::fields_count", "Mixed up pcl and non pcl.");
@@ -268,7 +268,7 @@ void QPointcloudPrivate::fields_clear(QQmlListProperty<QPointfield> *self)
 
 quint8 QPointcloud::is_bigendian() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->is_bigendian;
@@ -282,7 +282,7 @@ quint8 QPointcloud::is_bigendian() const
 
 quint32 QPointcloud::point_step() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->point_step;
@@ -296,7 +296,7 @@ quint32 QPointcloud::point_step() const
 
 quint32 QPointcloud::row_step() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->row_step;
@@ -310,7 +310,7 @@ quint32 QPointcloud::row_step() const
 
 QByteArray QPointcloud::data() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return QByteArray(reinterpret_cast<char*>(&m_priv->m_pointcloud->data[0]), m_priv->m_pointcloud->data.size());
@@ -325,7 +325,7 @@ QByteArray QPointcloud::data() const
 
 quint8 QPointcloud::is_dense() const
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         return m_priv->m_pointcloud->is_dense;
@@ -342,7 +342,7 @@ const QList<QPointfield *> &QPointcloud::getFields()
     return m_priv->m_fields;
 }
 
-#ifdef WITH_PCL
+#if WITH_PCL
 pcl::PCLPointCloud2 *QPointcloud::pointcloud() const
 {
     return m_priv->m_pointcloud;
@@ -395,7 +395,7 @@ QVector3D QPointcloud::offset() const
     return m_priv->m_offset;
 }
 
-#ifdef WITH_LAS
+#if WITH_LAS
 void QPointcloud::read(liblas::Reader *reader
                        , const bool useOffset
                        , double *offsetX
@@ -595,7 +595,7 @@ void QPointcloud::read(liblas::Reader *reader
 
 void QPointcloud::setHeight(quint32 height)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->height == height)
@@ -614,7 +614,7 @@ void QPointcloud::setHeight(quint32 height)
 
 void QPointcloud::setWidth(quint32 width)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->width == width)
@@ -633,7 +633,7 @@ void QPointcloud::setWidth(quint32 width)
 
 void QPointcloud::setIs_bigendian(quint8 is_bigendian)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->is_bigendian == is_bigendian)
@@ -652,7 +652,7 @@ void QPointcloud::setIs_bigendian(quint8 is_bigendian)
 
 void QPointcloud::setPoint_step(quint32 point_step)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->point_step == point_step)
@@ -672,7 +672,7 @@ void QPointcloud::setPoint_step(quint32 point_step)
 
 void QPointcloud::setRow_step(quint32 row_step)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->row_step == row_step)
@@ -692,7 +692,7 @@ void QPointcloud::setRow_step(quint32 row_step)
 
 void QPointcloud::setData(QByteArray data)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         m_priv->m_pointcloud->data.resize(data.size());
@@ -708,7 +708,7 @@ void QPointcloud::setData(QByteArray data)
 
 void QPointcloud::setIs_dense(quint8 is_dense)
 {
-#ifdef WITH_PCL
+#if WITH_PCL
     if(m_priv->m_pointcloud)
     {
         if (m_priv->m_pointcloud->is_dense == is_dense)
