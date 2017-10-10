@@ -343,8 +343,12 @@ const QList<QPointfield *> &QPointcloud::getFields()
 }
 
 #if WITH_PCL
-pcl::PCLPointCloud2 *QPointcloud::pointcloud() const
+pcl::PCLPointCloud2 *QPointcloud::pointcloud()
 {
+    if(nullptr == m_priv->m_pointcloud)
+    {
+        m_priv->m_pointcloud = new pcl::PCLPointCloud2();
+    }
     return m_priv->m_pointcloud;
 }
 

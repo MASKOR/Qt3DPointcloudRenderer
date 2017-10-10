@@ -13,8 +13,8 @@ find_package(Qt53DQuick REQUIRED)
 find_package(Qt53DRender REQUIRED)
 find_package(Qt53DQuickRender REQUIRED)
 
-set(WITH_PCL TRUE CACHE BOOL "Enable pcl")
-set(WITH_LAS TRUE CACHE BOOL "Enable las")
+set(WITH_PCL ON  CACHE BOOL "Enable pcl")
+set(WITH_LAS OFF CACHE BOOL "Enable las")
 
 if(WITH_PCL)
     find_package(PCL REQUIRED COMPONENTS common io)

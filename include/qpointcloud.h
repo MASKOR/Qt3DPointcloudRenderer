@@ -62,7 +62,7 @@ public:
     const QList<QPointfield *> &getFields();
 
 #if WITH_PCL
-    pcl::PCLPointCloud2* pointcloud() const;
+    pcl::PCLPointCloud2* pointcloud();
     void setPointcloud(const pcl::PCLPointCloud2 &copy);
 #endif
 #if WITH_LAS

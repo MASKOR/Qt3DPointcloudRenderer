@@ -37,7 +37,18 @@ add_executable(Qt3DPointcloudRenderer_example ${SOURCE} ${RESOURCES_RCC} ${QML} 
 
 target_link_libraries(Qt3DPointcloudRenderer_example Qt3DPointcloudRenderer)
 
-qt5_use_modules(Qt3DPointcloudRenderer_example Gui Widgets Qml Quick 3DCore 3DInput 3DLogic 3DQuick 3DRender 3DQuickInput 3DQuickRender)
+qt5_use_modules(Qt3DPointcloudRenderer_example
+                                               Gui
+                                               Widgets
+                                               Qml
+                                               Quick
+                                               3DCore
+                                               3DInput
+                                               3DLogic
+                                               3DQuick
+                                               3DRender
+                                               3DQuickInput
+                                               3DQuickRender)
 
 execute_process(
   COMMAND "${CMAKE_COMMAND}" "-E" "create_symlink" ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data

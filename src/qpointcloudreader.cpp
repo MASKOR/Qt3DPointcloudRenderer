@@ -22,6 +22,7 @@ void QPointCloudReader::setFilename(QString filename)
 {
     if (m_filename == filename)
         return;
+
     if(filename.endsWith(".pcd", Qt::CaseInsensitive))
     {
         pcl::PCDReader reader;
