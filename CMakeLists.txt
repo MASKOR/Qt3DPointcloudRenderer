@@ -1,5 +1,5 @@
 project(Qt3DPointcloudRenderer)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.2)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -55,9 +55,6 @@ if(WITH_LAS)
     endif(NOT HAVE_LIBGEOTIFF)
 endif(WITH_LAS)
 
-include_directories(${PROJECT_SOURCE_DIR}/src/)
-include_directories(${PROJECT_SOURCE_DIR}/include/)
-
 set(SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloud.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloudgeometry.cpp
@@ -80,6 +77,9 @@ if(BUILD_EXAMPLE)
 endif(BUILD_EXAMPLE)
 
 add_library(Qt3DPointcloudRenderer ${SOURCE} ${HEADER} ${LIBLAS_SOURCES} ${LASZIP_SOURCES})
+
+target_include_directories(Qt3DPointcloudRenderer PUBLIC  ${PROJECT_SOURCE_DIR}/include/
+                                                  PRIVATE ${PROJECT_SOURCE_DIR}/src/ )
 
 if(WITH_PCL)
     target_link_libraries(Qt3DPointcloudRenderer ${PCL_LIBRARIES} stdc++)

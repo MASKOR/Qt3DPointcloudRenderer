@@ -1,11 +1,12 @@
 # Qt3DPointcloudRenderer
 
-This library adds classes to be used with the Qt3D GeometryRenderer-Component. Moreover a Qml-Pointcloud type and pcd/ply-reader exist. The compiled library can be used by a program, that does not need pcl-headers.
-
+Adds C++ Classes and Qmltypes for rendering Point Cloud Library Pointcloud2 and libLAS pointclouds. Interfaces to both libraries look the same in qml. PCL or libLAS can be disabled to avoid the dependency to one of the libraries.
+This library adds classes to be used with the Qt3D GeometryRenderer-Component. Moreover a Qml-Pointcloud type and pcd/ply-reader exist. The compiled library can be used by a program, that does not need PCL/libLAS-headers.
+Pointclouds are read-only. However Qml binding re-evaluate if the internal pointcloud is changed.
 
 ## Qml Types
 
-* Pointcloud: Wraps pcl::PCLPointCloud2
+* Pointcloud: Wraps pcl::PCLPointCloud2; Reads LAS files using a provided liblas::Reader (TODO: this is only C++ yet)
 * Pointfield: Wraps pcl::PCLPointField
 * PointcloudReader: Wraps pcl::PCDReader and pcl::PLYReader
 * QPointcloudGeometry: Can be used as Qt3DRender::QGeometry to render a Pointcloud using Qt3DRender::GeometryRenderer
