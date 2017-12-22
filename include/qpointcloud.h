@@ -38,6 +38,7 @@ class QPointcloud : public QObject
     Q_PROPERTY(QVector3D centroid READ centroid NOTIFY centroidChanged)
     Q_PROPERTY(QVector3D offset READ offset NOTIFY offsetChanged)
 public:
+    QPointcloud(QPointcloud *copy);
     QPointcloud(QObject *parent = NULL);
     ////
     /// \brief QPointcloud takes ownership of the given pointcloud

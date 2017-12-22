@@ -115,6 +115,14 @@ public:
 //    }
 };
 
+QPointcloud::QPointcloud(QPointcloud *copy)
+    :m_priv(new QPointcloudPrivate(this))
+{
+#if WITH_PCL
+    this->setPointcloud( *copy->m_priv->m_pointcloud );
+#endif
+}
+
 QPointcloud::QPointcloud(QObject *parent)
     :QObject(parent),
      m_priv(new QPointcloudPrivate(this))
