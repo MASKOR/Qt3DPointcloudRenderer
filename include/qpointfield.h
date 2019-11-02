@@ -32,7 +32,8 @@ public:
     QPointfield(pcl::PCLPointField *field);
 #endif
     QPointfield(QObject *parent, QString name, quint32 offset, PointFieldTypes type, quint32 count);
-    //QPointfield(const QPointfield &cpy);
+    QPointfield(QObject *parent = nullptr);
+    QPointfield(const QPointfield &cpy);
     QString name() const;
     quint32 offset() const;
     PointFieldTypes datatype() const;

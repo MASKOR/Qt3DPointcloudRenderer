@@ -4,10 +4,21 @@
 #include <Qt3DRender/qbufferdatagenerator.h>
 #include <QHash>
 #include <iomanip>
-#include <pcl/PCLPointCloud2.h>
 #include <QSharedPointer>
-
+#ifdef WITH_PCL
+#include <pcl/PCLPointCloud2.h>
 #include <pcl/point_types.h>
+#else
+namespace pcl {
+    struct RGB
+    {
+      std::uint8_t b;
+      std::uint8_t g;
+      std::uint8_t r;
+      std::uint8_t a;
+    };
+}
+#endif
 
 //QByteArray createPointcloudVertexData(pcl::PCLPointCloud2 *pointcloud)
 //{
@@ -296,8 +307,9 @@ void QPointcloudGeometry::setPointcloud(QPointcloud *pointcloud)
 {
     if (m_p->m_pointcloud == pointcloud)
         return;
-
+    QObject::disconnect( m_p->m_pointcloud, &QPointcloud::dataChanged, this, &QPointcloudGeometry::updateVertices);
     m_p->m_pointcloud = pointcloud;
+    QObject::connect(pointcloud, &QPointcloud::dataChanged, this, &QPointcloudGeometry::updateVertices);
     updateVertices();
     Q_EMIT pointcloudChanged(pointcloud);
 }

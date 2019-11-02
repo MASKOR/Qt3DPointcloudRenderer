@@ -1,12 +1,12 @@
-#version 130
+#version 110
 
-in vec3 normal;
-in vec3 position;
-in vec3 color;
+//varying vec3 normal;
+//varying vec3 position;
+//varying highp vec3 color;
 
-uniform vec3 finalColor;
+//uniform vec3 finalColor;
 
-out vec4 fragColor;
+//varying vec4 fragColor;
 
 void main()
 {
@@ -16,5 +16,6 @@ void main()
 //    float diffuse = max(dot(s, n), 0.0);
 //    fragColor = vec4(diffuse * finalColor, 1.0);
 //    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-    fragColor = vec4(color, 1.0);
+//    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(0.0,0.5,0.5, 0.5);
 }

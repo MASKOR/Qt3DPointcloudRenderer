@@ -44,7 +44,9 @@ public:
     /// \brief QPointcloud takes ownership of the given pointcloud
     /// \param pointcloud will be deleted in destructor. Do not use shared pointer pcl::PCLPointcloud2Ptr from outside.
     ///
+#ifdef WITH_PCL
     QPointcloud(pcl::PCLPointCloud2 *pointcloud);
+#endif
     ~QPointcloud();
 
     void updateAttributes();

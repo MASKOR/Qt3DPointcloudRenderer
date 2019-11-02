@@ -87,6 +87,12 @@ QPointfield::QPointfield(QObject *parent, QString name, quint32 offset, PointFie
 {
 }
 
+QPointfield::QPointfield(QObject *parent)
+    :QObject(parent)
+{
+
+}
+
 QString QPointfield::name() const
 {
     return m_name;

@@ -15,7 +15,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<QPointCloudReader>("pcl", 1, 0, "PointcloudReader");
     qmlRegisterType<QPointcloud>("pcl", 1, 0, "Pointcloud");
     qmlRegisterType<QPointcloudGeometry>("pcl", 1, 0, "PointcloudGeometry");
-    qmlRegisterUncreatableType<QPointfield>("pcl", 1, 0, "Pointfield", "Can not yet be created in qml, use PointcloudReader.");
+    //qmlRegisterUncreatableType<QPointfield>("pcl", 1, 0, "Pointfield", "Can not yet be created in qml, use PointcloudReader.");
+    qmlRegisterType<QPointfield>("pcl", 1, 0, "Pointfield");
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
 

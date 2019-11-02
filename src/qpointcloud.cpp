@@ -19,7 +19,9 @@ class QPointcloudPrivate
 public:
     QPointcloudPrivate(QPointcloud* p)
         : m_parent(p)
+#ifdef WITH_PCL
         , m_pointcloud(nullptr)
+#endif
         , m_width(0)
         , m_height(1)
         , m_is_bigendian(0)
@@ -35,7 +37,9 @@ public:
         , m_dirtyCentroid(true)
     {}
     QPointcloud *m_parent;
+#ifdef WITH_PCL
     pcl::PCLPointCloud2 *m_pointcloud;
+#endif
     QList<QPointfield*> m_fields;
 
     quint32 m_height;

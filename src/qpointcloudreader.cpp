@@ -1,6 +1,8 @@
 #include "qpointcloudreader.h"
+#ifdef WITH_PCL
 #include "pcl/io/pcd_io.h"
 #include "pcl/io/ply_io.h"
+#endif
 #include <QDebug>
 
 QPointCloudReader::QPointCloudReader()
@@ -22,7 +24,7 @@ void QPointCloudReader::setFilename(QString filename)
 {
     if (m_filename == filename)
         return;
-
+#ifdef WITH_PCL
     if(filename.endsWith(".pcd", Qt::CaseInsensitive))
     {
         pcl::PCDReader reader;
@@ -34,6 +36,7 @@ void QPointCloudReader::setFilename(QString filename)
         reader.read(filename.toStdString(), *m_pointcloud->pointcloud());
     }
     qDebug() << "Read Pointcloud" << filename << "with" << ((m_pointcloud->pointcloud()->width) * (m_pointcloud->pointcloud()->height)) << "points.";
+#endif
     m_filename = filename;
     Q_EMIT filenameChanged(filename);
     Q_EMIT pointcloudChanged(m_pointcloud);
