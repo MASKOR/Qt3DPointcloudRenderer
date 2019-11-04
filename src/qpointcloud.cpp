@@ -240,7 +240,7 @@ int QPointcloudPrivate::fields_count(QQmlListProperty<QPointfield> *self)
     else
 #endif
     {
-        that->m_fields.count();
+        return that->m_fields.count();
     }
 }
 
@@ -257,7 +257,7 @@ QPointfield *QPointcloudPrivate::fields_at(QQmlListProperty<QPointfield> *self, 
     else
 #endif
     {
-        that->m_fields.at(i);
+        return that->m_fields.at(i);
     }
 }
 

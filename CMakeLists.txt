@@ -60,6 +60,7 @@ set(SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloudgeometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointfield.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/qpointcloudreader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/streamdata.cpp
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/xyzcsvreader.cpp
   )
 set(HEADER
@@ -67,6 +68,7 @@ set(HEADER
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointcloudgeometry.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointfield.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/qpointcloudreader.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/streamdata.h
 #    ${CMAKE_CURRENT_SOURCE_DIR}/include/xyzcsvreader.h
   )
 

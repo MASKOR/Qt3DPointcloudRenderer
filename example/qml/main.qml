@@ -161,9 +161,11 @@ ApplicationWindow {
                     property var meshTransform: Q3D.Transform {
                             id: pointcloudTransform
                             property real userAngle: rotator.rotationAnimation
-                            scale: 20
-                            translation: Qt.vector3d(0, -2, 0)
-                            rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), userAngle)
+                            scale: 2
+                            //translation: Qt.vector3d(0, -2, 0)
+                            //rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), userAngle)
+                            translation: Qt.vector3d(0, 0, 0)
+                            rotation: fromAxisAndAngle(Qt.vector3d(0, 1, 0), 0.0)
                         }
 //                    property GeometryRenderer pointcloudMesh: GeometryRenderer {
 //                                instanceCount: 1
@@ -216,24 +218,41 @@ ApplicationWindow {
                                             }*/
                                         ]
                                         point_step: 12 // 24
-                                        width: 5
-                                        property var vertices: [[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0, -10.0, 0.0], [0.0, 2.0, 2.0], [-0.1, 0.0, -0.1]]
-                                        function buildVertexBufferData() {
+                                        width: Streamdata.capacity/3/4//5
+                                        property var vertices: [[0.0, 0.0, 0.0],
+                                                                [0.0, 1.0, 0.0],
+                                                                [0, -10.0, 0.0],
+                                                                [0.0, 2.0, 2.0],
+                                                                [-0.1, 0.0, -0.1]]
+                                        function buildVertexBufferData(dat) {
                                             var arrayBuffer = new ArrayBuffer(vertices.length * 3 * 4);
                                             var vertexArray = new Float32Array(arrayBuffer);//vertices.length * 3);
                                             var i = 0;
+                                            var offs = Math.sin(dat)*2;
+                                            var offs2 = Math.cos(dat+0.5)*3;
                                             vertices.forEach(function(vec3) {
-                                                vertexArray[i++] = vec3[0];
-                                                vertexArray[i++] = vec3[1];
+                                                vertexArray[i++] = vec3[0]+offs;
+                                                vertexArray[i++] = vec3[1]+offs2;
                                                 vertexArray[i++] = vec3[2];
                                             });
 
                                             return arrayBuffer;
                                         }
-                                        data: buildVertexBufferData()
+                                        data: Streamdata.data//buildVertexBufferData(9)//timer.dat)
                                     }
                                 }
                             }
+//                    Timer {
+//                        id: timer
+//                        interval: 100
+//                        running: true
+//                        repeat: true
+//                        property int dat: 0
+//                        onTriggered: {
+//                            dat = dat + 1;
+//                            //buildVertexBufferData(dat)
+//                        }
+//                    }
                     property Material materialPoint: Material {
                         id: matPoint
                         effect: Effect {

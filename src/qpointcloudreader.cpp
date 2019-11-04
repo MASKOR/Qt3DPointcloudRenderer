@@ -36,6 +36,11 @@ void QPointCloudReader::setFilename(QString filename)
         reader.read(filename.toStdString(), *m_pointcloud->pointcloud());
     }
     qDebug() << "Read Pointcloud" << filename << "with" << ((m_pointcloud->pointcloud()->width) * (m_pointcloud->pointcloud()->height)) << "points.";
+#else
+    if(filename.endsWith(".pcd", Qt::CaseInsensitive))
+    {
+        // implement ascii, binary without dependency on pcl
+    }
 #endif
     m_filename = filename;
     Q_EMIT filenameChanged(filename);
