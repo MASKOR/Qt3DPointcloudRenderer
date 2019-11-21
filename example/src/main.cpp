@@ -9,6 +9,7 @@
 #include "qpointfield.h"
 #include "qpointcloudreader.h"
 #include "streamdata.h"
+#include <cmath>
 
 static Streamdata* g_streamdata = nullptr;
 QObject* streamdata(QQmlEngine *, QJSEngine *)

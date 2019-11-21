@@ -3,12 +3,13 @@
 
 Streamdata::Streamdata(QObject *parent)
     : QObject(parent)
-    , m_capacity(10000)
+    , m_capacity(100000)
     , m_data(m_capacity, Qt::Uninitialized)
     , m_writeIndex(0)
     , m_readIndex(0)
     , m_isEmpty(true)
     , m_dataMutex(QMutex::Recursive)
+    , m_divisor(24)
 {
 
 }
@@ -38,6 +39,11 @@ bool Streamdata::isEmpty() const
     return m_isEmpty;
 }
 
+int Streamdata::divisor() const
+{
+    return m_divisor;
+}
+
 void Streamdata::setCapacity(int capacity)
 {
     if (m_capacity == capacity)
@@ -62,6 +68,14 @@ void Streamdata::setData(QByteArray data)
     emit dataChanged(m_data);
 }
 
+void Streamdata::setDivisor(int divisor)
+{
+    if (m_divisor == divisor)
+        return;
+    m_divisor = divisor;
+    emit divisorChanged(m_divisor);
+}
+
 void Streamdata::consume(const char *ptr, int len)
 {
     if(len > m_capacity) {
@@ -70,6 +84,9 @@ void Streamdata::consume(const char *ptr, int len)
         setCapacity(len);
     }
     auto spaceLeft = m_data.size()-m_writeIndex;
+    auto spaceLeftDivisor = spaceLeft % m_divisor;
+    spaceLeft -= spaceLeftDivisor;
+
     if(len > spaceLeft)
     {
         auto overhang = len-spaceLeft;

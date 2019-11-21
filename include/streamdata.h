@@ -12,6 +12,7 @@ class Streamdata : public QObject
     Q_PROPERTY(int writeIndex READ writeIndex NOTIFY writeIndexChanged)
     Q_PROPERTY(int readIndex READ readIndex NOTIFY readIndexChanged)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
+    Q_PROPERTY(int divisor READ divisor WRITE setDivisor NOTIFY divisorChanged)
 public:
     Streamdata(QObject *parent = nullptr);
     int capacity() const;
@@ -20,10 +21,12 @@ public:
     int writeIndex() const;
     int readIndex() const;
     bool isEmpty() const;
+    int divisor() const;
 
 public slots:
     void setCapacity(int capacity);
     void setData(QByteArray data);
+    void setDivisor(int divisor);
     void consume(const char* ptr, int len);
 
 signals:
@@ -32,12 +35,14 @@ signals:
     void writeIndexChanged(int writeIndex);
     void readIndexChanged(int readIndex);
     void isEmptyChanged(bool isEmpty);
+    void divisorChanged(int divisor);
 
 private:
     int m_capacity;
     QByteArray m_data;
     int m_writeIndex;
     int m_readIndex;
+    int m_divisor;
     bool m_isEmpty;
     QMutex  m_dataMutex;
 };
