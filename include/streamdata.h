@@ -8,7 +8,7 @@ class Streamdata : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int capacity READ capacity WRITE setCapacity NOTIFY capacityChanged)
-    Q_PROPERTY(QByteArray data READ data WRITE setData NOTIFY dataChanged)
+    Q_PROPERTY(QByteArray data READ data NOTIFY dataChanged)
     Q_PROPERTY(int writeIndex READ writeIndex NOTIFY writeIndexChanged)
     Q_PROPERTY(int readIndex READ readIndex NOTIFY readIndexChanged)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
@@ -17,7 +17,7 @@ public:
     Streamdata(QObject *parent = nullptr);
     int capacity() const;
     //TODO: Pointer, ref?
-    QByteArray data() const;
+    QByteArray data();
     int writeIndex() const;
     int readIndex() const;
     bool isEmpty() const;
@@ -25,13 +25,12 @@ public:
 
 public slots:
     void setCapacity(int capacity);
-    void setData(QByteArray data);
     void setDivisor(int divisor);
     void consume(const char* ptr, int len);
 
 signals:
     void capacityChanged(int capacity);
-    void dataChanged(QByteArray data);
+    void dataChanged();
     void writeIndexChanged(int writeIndex);
     void readIndexChanged(int readIndex);
     void isEmptyChanged(bool isEmpty);
@@ -39,7 +38,7 @@ signals:
 
 private:
     int m_capacity;
-    QByteArray m_data;
+    std::vector<char> m_data;
     int m_writeIndex;
     int m_readIndex;
     int m_divisor;

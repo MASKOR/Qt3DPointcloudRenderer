@@ -1,15 +1,17 @@
 #include "streamdata.h"
 #include <QMutexLocker>
+#include <iostream>
+#include <cmath>
 
 Streamdata::Streamdata(QObject *parent)
     : QObject(parent)
-    , m_capacity(100000)
-    , m_data(m_capacity, Qt::Uninitialized)
+    , m_capacity(1)
+    , m_data()//m_capacity, Qt::Uninitialized)
     , m_writeIndex(0)
     , m_readIndex(0)
+    , m_divisor(24)
     , m_isEmpty(true)
     , m_dataMutex(QMutex::Recursive)
-    , m_divisor(24)
 {
 
 }
@@ -19,9 +21,11 @@ int Streamdata::capacity() const
     return m_capacity;
 }
 
-QByteArray Streamdata::data() const
+QByteArray Streamdata::data()
 {
-    return m_data;
+    QMutexLocker lock{&m_dataMutex};
+    // deep copy
+    return QByteArray(m_data.data(), m_data.size());
 }
 
 int Streamdata::writeIndex() const
@@ -53,19 +57,9 @@ void Streamdata::setCapacity(int capacity)
         QMutexLocker lock{&m_dataMutex};
         m_capacity = capacity;
         m_data.resize(m_capacity);
-        setData(data());
+        emit dataChanged();
     }
     emit capacityChanged(m_capacity);
-}
-
-void Streamdata::setData(QByteArray data)
-{
-    if (m_data == data)
-        return;
-
-    QMutexLocker lock{&m_dataMutex};
-    m_data = data;
-    emit dataChanged(m_data);
 }
 
 void Streamdata::setDivisor(int divisor)
@@ -78,26 +72,37 @@ void Streamdata::setDivisor(int divisor)
 
 void Streamdata::consume(const char *ptr, int len)
 {
-    if(len > m_capacity) {
+    QMutexLocker lock{&m_dataMutex};
+    if(len > m_capacity || len > m_data.size()) {
         // TODO: remove lots of uneccesary copying and locking
-        QMutexLocker lock{&m_dataMutex};
         setCapacity(len);
     }
-    auto spaceLeft = m_data.size()-m_writeIndex;
+    auto spaceLeft = static_cast<int>(m_data.size())-m_writeIndex;
     auto spaceLeftDivisor = spaceLeft % m_divisor;
     spaceLeft -= spaceLeftDivisor;
 
     if(len > spaceLeft)
     {
         auto overhang = len-spaceLeft;
+        //m_data.replace(m_writeIndex, spaceLeft, ptr);
+        //m_data.replace(0, overhang, ptr + spaceLeft);
         memcpy(m_data.data() + m_writeIndex, ptr, static_cast<size_t>(spaceLeft));
         memcpy(m_data.data(), ptr + spaceLeft, static_cast<size_t>(overhang));
         m_writeIndex = overhang;
+
     }
     else
     {
+        //m_data.replace(m_writeIndex, len, ptr);
         memcpy(m_data.data() + m_writeIndex, ptr, static_cast<size_t>(len));
-        m_writeIndex += len;
+        if(len == spaceLeft)
+        {
+            m_writeIndex = 0;
+        }
+        else
+        {
+            m_writeIndex += len;
+        }
     }
-    emit dataChanged(m_data);
+    emit dataChanged();
 }
