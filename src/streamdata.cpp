@@ -56,10 +56,10 @@ void Streamdata::setCapacity(int capacity)
     {
         QMutexLocker lock{&m_dataMutex};
         m_capacity = capacity;
-        m_data.resize(m_capacity);
-        emit dataChanged();
+        m_data.resize(m_capacity * divisor());
     }
     emit capacityChanged(m_capacity);
+    emit dataChanged();
 }
 
 void Streamdata::setDivisor(int divisor)
@@ -73,10 +73,12 @@ void Streamdata::setDivisor(int divisor)
 void Streamdata::consume(const char *ptr, int len)
 {
     QMutexLocker lock{&m_dataMutex};
-    if(len > m_capacity || len > m_data.size()) {
+    if(len > (m_capacity * m_divisor) || len > m_data.size()) {
         // TODO: remove lots of uneccesary copying and locking
-        setCapacity(len);
+        setCapacity(len / m_divisor);
     }
+    if(m_writeIndex > m_data.size()) m_writeIndex = 0;
+
     auto spaceLeft = static_cast<int>(m_data.size())-m_writeIndex;
     auto spaceLeftDivisor = spaceLeft % m_divisor;
     spaceLeft -= spaceLeftDivisor;
